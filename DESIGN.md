@@ -19,14 +19,14 @@ Key design principles:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   Frontend (React + Memstack)                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │ Idea Input   │  │   Roadmap    │  │   Team       │      │
-│  │ Component    │→ │   Display    │→ │   Builder    │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-│                                                               │
+│                   Frontend (React + Memstack)               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │ Idea Input   │  │   Roadmap    │  │   Team       │       │
+│  │ Component    │→ │   Display    │→ │   Builder    │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+│                                                             │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │              Memstack State Management               │    │
+│  │              Memstack State Management              │    │
 │  │  • Session state (roadmap, candidates, team)        │    │
 │  │  • API integration layer                            │    │
 │  │  • Client-side persistence                          │    │
@@ -34,15 +34,15 @@ Key design principles:
 └─────────────────────────────────────────────────────────────┘
                             ↓ HTTP/REST
 ┌─────────────────────────────────────────────────────────────┐
-│                      Backend API Server                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   Roadmap    │  │  Candidate   │  │   Session    │      │
-│  │   Service    │  │   Service    │  │   Manager    │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│                      Backend API Server                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │   Roadmap    │  │  Candidate   │  │   Session    │       │
+│  │   Service    │  │   Service    │  │   Manager    │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                    External Dependencies                     │
+│                    External Dependencies                    │
 │  ┌──────────────┐  ┌──────────────┐                         │
 │  │  AI/LLM API  │  │  Candidate   │                         │
 │  │  (OpenAI)    │  │  Database    │                         │
