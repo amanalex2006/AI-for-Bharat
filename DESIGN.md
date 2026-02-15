@@ -322,275 +322,215 @@ function calculateMatchScore(
 }
 ```
 
-### AI Prompt Structure
+![Mockup1](preview/diag1.png)
+![Mockup2](preview/diag2.png)
+![Mockup3](preview/diag3.png)
 
-The system uses a structured prompt to generate consistent roadmaps:
+## System Architecture
 
-```
-You are a project planning assistant. Analyze the following project idea and generate a structured execution roadmap.
+The platform follows a modular, service-oriented architecture combining AI orchestration, automation agents, and core project management services.
 
-Project Idea: {projectIdea}
+### High-Level Layers
 
-Generate a JSON response with the following structure:
-{
-  "projectSummary": "2-3 sentence overview",
-  "coreFeatures": ["feature1", "feature2", ...],
-  "requiredRoles": [
-    {
-      "title": "Role Title",
-      "description": "Role description",
-      "requiredSkills": ["skill1", "skill2", ...]
-    }
-  ],
-  "technologyStack": ["tech1", "tech2", ...],
-  "developmentPhases": [
-    {
-      "name": "Phase Name",
-      "description": "Phase description",
-      "estimatedDuration": "X weeks"
-    }
-  ]
-}
+* **Frontend Layer**
+  Interfaces for founders, freelancers, and admins built with a reactive web framework.
 
-Ensure the response is valid JSON and includes at least 3 core features, 3 required roles, and 3 development phases.
-```
+* **Backend API Layer**
+  Handles authentication, project management, sprint logic, reporting, and integrations.
 
+* **AI Orchestration Layer**
+  Responsible for idea analysis, task decomposition, candidate matching, and decision support.
 
-## Correctness Properties
+* **Automation Agent Layer**
+  Browser-based agents that interact with external freelance platforms for discovery and communication.
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+* **Data Layer**
+  Persistent storage for users, projects, tasks, candidates, sprints, reports, and payments.
 
-### Property 1: Input validation enforces minimum length
+---
 
-*For any* string input, if the length is less than 50 characters, the system should reject it with a validation message; if the length is 50 or more characters, the system should accept it and proceed to roadmap generation.
+## Core Components
 
-**Validates: Requirements 1.1, 1.2, 1.3, 1.4**
+### Idea Intake & Feasibility Engine
 
-### Property 2: Roadmap structure completeness
+**Purpose:** Convert founder input into structured project understanding.
+**Inputs:** Founder idea, optional constraints, budget, timeline.
+**Outputs:**
 
-*For any* generated execution roadmap, it should contain all required fields: a non-empty project summary, a non-empty list of core features, a non-empty list of required roles (each with a description), a non-empty technology stack, and a non-empty list of development phases.
+* Feasibility score
+* Risk indicators
+* High-level architecture outline
 
-**Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5, 2.6**
+**Design Notes:**
 
-### Property 3: Candidate recommendation count
+* Uses LLM reasoning with validation rules.
+* Stores versioned analysis for traceability.
 
-*For any* execution roadmap with required roles, the system should recommend at least 3 candidates for each role.
+---
 
-**Validates: Requirements 3.1**
+### Task Breakdown Engine
 
-### Property 4: Candidate profile completeness
+**Purpose:** Transform validated ideas into executable work units.
+**Outputs:**
 
-*For any* candidate profile, it should contain all required fields: a non-empty name, a non-empty skills list, experience information, a valid cost range (with min, max, and currency), and a match score between 0 and 100 (inclusive).
+* Hierarchical task tree
+* Dependencies
+* Estimated effort
+* Required roles
 
-**Validates: Requirements 3.2, 3.3, 3.4, 3.5, 3.6**
+**Design Notes:**
 
-### Property 5: Team selection addition
+* Combines prompt-driven AI with rule-based normalization.
+* Produces sprint-ready backlog.
 
-*For any* candidate and team selection state, when a candidate is selected, the resulting team selection should contain that candidate.
+---
 
-**Validates: Requirements 4.3**
+### Candidate Discovery Agent
 
-### Property 6: Team selection removal
+**Purpose:** Identify and contact suitable freelancers automatically.
 
-*For any* candidate in the team selection, when that candidate is removed, the resulting team selection should not contain that candidate.
+**Subcomponents:**
 
-**Validates: Requirements 4.4**
+* Platform crawler (Playwright automation)
+* Profile parser and scorer
+* Messaging automation
+* Shortlist generator
 
-### Property 7: Team selection display consistency
+**Flow:**
 
-*For any* team selection state, the displayed team selection should exactly match the set of selected candidates in the state.
+1. Receive required roles and skills.
+2. Search external platforms.
+3. Score candidates via AI ranking.
+4. Send outreach messages.
+5. Return shortlist for approval.
 
-**Validates: Requirements 4.5**
+---
 
-### Property 8: Roadmap display after generation
+### Human Approval Interface
 
-*For any* completed roadmap generation, the system should display both the roadmap and the candidate recommendations.
+**Purpose:** Keep founders in control of hiring decisions.
 
-**Validates: Requirements 5.4**
+**Capabilities:**
 
-### Property 9: Session data persistence
+* View ranked candidates
+* Inspect profiles and history
+* Approve or reject
+* Trigger recruitment finalization
 
-*For any* session with a generated roadmap and team selection modifications, retrieving the session data should return the same roadmap and team selection that were stored.
+---
 
-**Validates: Requirements 8.1, 8.2, 8.3**
+### Sprint Management Engine
 
-### Property 10: Error logging without exposure
+**Purpose:** Coordinate execution after hiring.
 
-*For any* error that occurs in the system, the error should be logged for debugging, but the user-facing error message should not contain technical implementation details (such as stack traces, internal variable names, or system paths).
+**Responsibilities:**
 
-**Validates: Requirements 9.4**
+* Convert backlog into sprints
+* Assign tasks to freelancers
+* Track status, submissions, and revisions
+* Maintain timeline and blockers
 
-## Error Handling
+**State Model:**
 
-### Input Validation Errors
+* Planned → Active → Review → Completed
 
-**Scenario**: User submits project idea with fewer than 50 characters
+---
 
-**Handling**:
-- Display validation message: "Please provide more detail about your project (minimum 50 characters)"
-- Keep user on input screen
-- Preserve entered text in input field
-- Highlight input field with error styling
+### Progress Evaluation & Reporting
 
-### AI Generation Errors
+**Purpose:** Provide transparency and accountability.
 
-**Scenario**: AI service fails to generate roadmap (timeout, API error, invalid response)
+**Generated Artifacts:**
 
-**Handling**:
-- Display user-friendly message: "We couldn't generate your roadmap right now. Please try again."
-- Provide retry button
-- Log detailed error information server-side
-- Preserve user's original input for retry
+* Sprint summary
+* Completion metrics
+* Budget consumption
+* Remaining workload
 
-**Scenario**: AI returns malformed JSON or incomplete roadmap
+**Design Notes:**
 
-**Handling**:
-- Validate roadmap structure before returning to client
-- If validation fails, retry generation once automatically
-- If second attempt fails, show error message and allow manual retry
-- Log validation failures for debugging
+* Reports are immutable once finalized.
+* Historical comparison across sprints supported.
 
-### Candidate Retrieval Errors
+---
 
-**Scenario**: Database query fails or returns insufficient candidates
+### Payment Management System
 
-**Handling**:
-- If fewer than 3 candidates found for a role, return all available candidates
-- Display message: "Limited candidates available for [role]. We're showing all matches."
-- Log insufficient candidate scenarios for data improvement
+**Purpose:** Ensure fair and traceable compensation.
 
-### Session Errors
+**Functions:**
 
-**Scenario**: Session not found or expired
+* Track earnings per task and sprint
+* Maintain escrow-style allocation (logical or integrated)
+* Release payments after approval
+* Provide transaction history
 
-**Handling**:
-- Redirect user to start screen
-- Display message: "Your session has expired. Please start a new project."
-- Clear any stale session data from client
+---
 
-### Network Errors
+### Authentication & Authorization
 
-**Scenario**: Client cannot reach backend API
+**Roles:**
 
-**Handling**:
-- Display message: "Connection error. Please check your internet connection and try again."
-- Provide retry button
-- Implement exponential backoff for retries (1s, 2s, 4s)
+* Founder
+* Freelancer
+* Admin
 
-## Testing Strategy
+**Design:**
 
-### Unit Testing
+* Token-based authentication with refresh flow.
+* Role-based access control at API and UI levels.
 
-Unit tests will focus on specific examples, edge cases, and error conditions:
+---
 
-**Input Validation**:
-- Test exact boundary: 49 characters (invalid), 50 characters (valid)
-- Test empty string
-- Test very long input (10,000+ characters)
+## Data Model Overview
 
-**Roadmap Parsing**:
-- Test valid AI response parsing
-- Test malformed JSON handling
-- Test missing required fields
+### Core Entities
 
-**Match Score Calculation**:
-- Test candidate with 0 matching skills (score = 0)
-- Test candidate with all matching skills and 10+ years experience (score = 100)
-- Test various experience levels (0, 3, 6, 10 years)
+* **User** (role, profile, credentials)
+* **Project** (idea, feasibility, status, budget)
+* **Task** (description, role, estimate, dependency, status)
+* **Sprint** (timebox, tasks, progress, report)
+* **Candidate** (source platform, score, approval state)
+* **Payment** (amount, milestone, release status)
+* **Report** (metrics, cost, summary)
 
-**Session Management**:
-- Test session creation
-- Test session retrieval with valid ID
-- Test session retrieval with invalid ID
-- Test session expiration
+### Relationships
 
-**Team Selection**:
-- Test adding first candidate to empty team
-- Test adding duplicate candidate (should be idempotent)
-- Test removing candidate not in team (should be no-op)
+* A **Founder** owns multiple **Projects**.
+* A **Project** contains many **Tasks** and **Sprints**.
+* **Tasks** are assigned to **Freelancers**.
+* **Sprints** generate **Reports** and **Payments**.
 
-### Property-Based Testing
+---
 
-Property-based tests will verify universal properties across randomized inputs. Each test should run a minimum of 100 iterations.
+## External Integrations
 
-**Testing Library**: Use `fast-check` for JavaScript/TypeScript or `hypothesis` for Python
+* Freelance platforms via browser automation.
+* Payment gateway for fund transfer.
+* LLM provider for reasoning and generation.
 
-**Property Test Configuration**:
-```typescript
-// Example configuration for fast-check
-fc.assert(
-  fc.property(
-    fc.string({ minLength: 50, maxLength: 1000 }),
-    (projectIdea) => {
-      // Test property
-    }
-  ),
-  { numRuns: 100 }
-);
-```
+---
 
-**Property Tests to Implement**:
+## Security Design
 
-1. **Input Validation Property** (Property 1)
-    - Generate random strings of varying lengths
-    - Verify acceptance/rejection based on length threshold
-    - Tag: `Feature: team-foundry, Property 1: Input validation enforces minimum length`
+* Encrypted token storage and transmission.
+* Scoped automation credentials.
+* Audit logs for AI decisions, hiring, and payments.
 
-2. **Roadmap Structure Property** (Property 2)
-    - Generate random valid roadmaps
-    - Verify all required fields are present and non-empty
-    - Tag: `Feature: team-foundry, Property 2: Roadmap structure completeness`
+---
 
-3. **Candidate Count Property** (Property 3)
-    - Generate random roadmaps with varying numbers of roles
-    - Verify each role has at least 3 candidates
-    - Tag: `Feature: team-foundry, Property 3: Candidate recommendation count`
+## Scalability Strategy
 
-4. **Candidate Profile Property** (Property 4)
-    - Generate random candidate profiles
-    - Verify all required fields present and match score in valid range
-    - Tag: `Feature: team-foundry, Property 4: Candidate profile completeness`
+* Stateless backend services.
+* Queue-based agent execution.
+* Horizontal scaling for AI and automation workers.
+* Separate reporting and analytics storage if needed.
 
-5. **Team Selection Addition Property** (Property 5)
-    - Generate random team states and candidates
-    - Verify selection adds candidate to team
-    - Tag: `Feature: team-foundry, Property 5: Team selection addition`
+---
 
-6. **Team Selection Removal Property** (Property 6)
-    - Generate random team states with candidates
-    - Verify removal removes candidate from team
-    - Tag: `Feature: team-foundry, Property 6: Team selection removal`
+## Future Design Extensions
 
-7. **Team Display Consistency Property** (Property 7)
-    - Generate random team selection states
-    - Verify displayed team matches internal state
-    - Tag: `Feature: team-foundry, Property 7: Team selection display consistency`
-
-8. **Session Persistence Property** (Property 9)
-    - Generate random session data (roadmaps, team selections)
-    - Verify stored data matches retrieved data
-    - Tag: `Feature: team-foundry, Property 9: Session data persistence`
-
-9. **Error Message Safety Property** (Property 10)
-    - Generate random errors with technical details
-    - Verify user-facing messages don't contain stack traces, paths, or internal names
-    - Tag: `Feature: team-foundry, Property 10: Error logging without exposure`
-
-### Integration Testing
-
-Integration tests will verify end-to-end flows:
-
-- Complete flow: idea input → roadmap generation → candidate display → team selection
-- Session persistence across multiple API calls
-- Error recovery flows (retry after failure)
-
-### Manual Testing Checklist
-
-For the hackathon demo:
-- [ ] Submit various project ideas and verify roadmap quality
-- [ ] Verify UI responsiveness and loading indicators
-- [ ] Test team selection/deselection interactions
-- [ ] Verify session persistence across page refresh
-- [ ] Test error scenarios (disconnect network, invalid input)
-- [ ] Verify mobile responsiveness
-- [ ] Test with different browsers (Chrome, Firefox, Safari)
+* Multi-agent collaboration planning.
+* Autonomous code generation and validation loops.
+* Continuous deployment orchestration.
+* Marketplace abstraction across many hiring sources.
