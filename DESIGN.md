@@ -2,7 +2,7 @@
 
 ## Overview
 
-Team Foundry is a single-page web application that transforms project ideas into executable roadmaps with AI-recommended team candidates. The system follows a linear flow: idea input → AI analysis → roadmap generation → candidate recommendation → human team selection.
+Team Foundry is a single-page web application that transforms project ideas into executable roadmaps and learning-oriented development plans that accelerate developer productivity, with AI-recommended team candidates. The system follows a linear flow: idea input → AI analysis → roadmap generation → candidate recommendation → human team selection.
 
 The architecture emphasizes simplicity for the hackathon MVP, using a client-server model where the frontend handles user interaction and display, while the backend orchestrates AI processing and data retrieval. The system maintains session-based state without requiring user authentication.
 
@@ -11,6 +11,7 @@ Key design principles:
 - **Speed**: Complete flow in under 60 seconds
 - **Simplicity**: Single-page experience with minimal navigation
 - **Transparency**: Clear feedback at each step
+- **Productivity-first**: Reduce time from idea to development start
 
 ## Architecture
 
@@ -363,13 +364,13 @@ Ensure the response is valid JSON and includes at least 3 core features, 3 requi
 
 *For any* string input, if the length is less than 50 characters, the system should reject it with a validation message; if the length is 50 or more characters, the system should accept it and proceed to roadmap generation.
 
-**Validates: Requirements 1.2, 1.3, 1.4**
+**Validates: Requirements 1.1, 1.2, 1.3, 1.4**
 
 ### Property 2: Roadmap structure completeness
 
 *For any* generated execution roadmap, it should contain all required fields: a non-empty project summary, a non-empty list of core features, a non-empty list of required roles (each with a description), a non-empty technology stack, and a non-empty list of development phases.
 
-**Validates: Requirements 2.2, 2.3, 2.4, 2.5, 2.6**
+**Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5, 2.6**
 
 ### Property 3: Candidate recommendation count
 
@@ -531,49 +532,49 @@ fc.assert(
 **Property Tests to Implement**:
 
 1. **Input Validation Property** (Property 1)
-  - Generate random strings of varying lengths
-  - Verify acceptance/rejection based on length threshold
-  - Tag: `Feature: team-foundry, Property 1: Input validation enforces minimum length`
+    - Generate random strings of varying lengths
+    - Verify acceptance/rejection based on length threshold
+    - Tag: `Feature: team-foundry, Property 1: Input validation enforces minimum length`
 
 2. **Roadmap Structure Property** (Property 2)
-  - Generate random valid roadmaps
-  - Verify all required fields are present and non-empty
-  - Tag: `Feature: team-foundry, Property 2: Roadmap structure completeness`
+    - Generate random valid roadmaps
+    - Verify all required fields are present and non-empty
+    - Tag: `Feature: team-foundry, Property 2: Roadmap structure completeness`
 
 3. **Candidate Count Property** (Property 3)
-  - Generate random roadmaps with varying numbers of roles
-  - Verify each role has at least 3 candidates
-  - Tag: `Feature: team-foundry, Property 3: Candidate recommendation count`
+    - Generate random roadmaps with varying numbers of roles
+    - Verify each role has at least 3 candidates
+    - Tag: `Feature: team-foundry, Property 3: Candidate recommendation count`
 
 4. **Candidate Profile Property** (Property 4)
-  - Generate random candidate profiles
-  - Verify all required fields present and match score in valid range
-  - Tag: `Feature: team-foundry, Property 4: Candidate profile completeness`
+    - Generate random candidate profiles
+    - Verify all required fields present and match score in valid range
+    - Tag: `Feature: team-foundry, Property 4: Candidate profile completeness`
 
 5. **Team Selection Addition Property** (Property 5)
-  - Generate random team states and candidates
-  - Verify selection adds candidate to team
-  - Tag: `Feature: team-foundry, Property 5: Team selection addition`
+    - Generate random team states and candidates
+    - Verify selection adds candidate to team
+    - Tag: `Feature: team-foundry, Property 5: Team selection addition`
 
 6. **Team Selection Removal Property** (Property 6)
-  - Generate random team states with candidates
-  - Verify removal removes candidate from team
-  - Tag: `Feature: team-foundry, Property 6: Team selection removal`
+    - Generate random team states with candidates
+    - Verify removal removes candidate from team
+    - Tag: `Feature: team-foundry, Property 6: Team selection removal`
 
 7. **Team Display Consistency Property** (Property 7)
-  - Generate random team selection states
-  - Verify displayed team matches internal state
-  - Tag: `Feature: team-foundry, Property 7: Team selection display consistency`
+    - Generate random team selection states
+    - Verify displayed team matches internal state
+    - Tag: `Feature: team-foundry, Property 7: Team selection display consistency`
 
 8. **Session Persistence Property** (Property 9)
-  - Generate random session data (roadmaps, team selections)
-  - Verify stored data matches retrieved data
-  - Tag: `Feature: team-foundry, Property 9: Session data persistence`
+    - Generate random session data (roadmaps, team selections)
+    - Verify stored data matches retrieved data
+    - Tag: `Feature: team-foundry, Property 9: Session data persistence`
 
 9. **Error Message Safety Property** (Property 10)
-  - Generate random errors with technical details
-  - Verify user-facing messages don't contain stack traces, paths, or internal names
-  - Tag: `Feature: team-foundry, Property 10: Error logging without exposure`
+    - Generate random errors with technical details
+    - Verify user-facing messages don't contain stack traces, paths, or internal names
+    - Tag: `Feature: team-foundry, Property 10: Error logging without exposure`
 
 ### Integration Testing
 
